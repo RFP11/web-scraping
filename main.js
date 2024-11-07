@@ -85,7 +85,7 @@ async function pagination(oldPage,oldBrowser, uri, currentPage=1, targetPage=5){
     logger.info(url)
 
     logger.info('Closing old Page')
-    await Promise.all(oldPage.map((page) => page.close()));
+    await oldPage.close()
     await oldBrowser.close()
 
     sleep(1000)
@@ -282,24 +282,30 @@ const zillowServ = async () => {
     let browser = await initBrowser()
     const page = await createPage(browser)
 
-    browser = await pagination(page,browser, zillow, 0, 1)
+    browser = await pagination(page,browser, zillow, 0, 5)
     
     await browser.close()
 }
 
-const etsyServe = async () => {
+const etsyServe = async (index) => {
     const browser = await initZenrows()
     const page = await browser.newPage()
+    await page.setViewport({
+        width: 1080,
+        height: 720
+    })
 
-    sleep(1000)
+    sleep(1500)
 
     logger.info(`Navigating to ${etsy}`)
-    await page.goto(etsy)
+    await page.goto(etsy, {
+        timeout : 0
+    })
 
     sleep(3000)
 
     logger.info('Taking Screenshot')
-    await page.screenshot({path: 'zenrowsDebug/etsy.png', fullPage: true})
+    await page.screenshot({path: `zenrowsDebug/etsy${index}.png`, fullPage: true})
 
     sleep(2000)
 
@@ -312,5 +318,5 @@ const etsyServe = async () => {
 
 zillowServ()
 // zillowCaptchaServe()
-// etsyServe()
+// main()
 // extractFile()
